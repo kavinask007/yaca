@@ -6,13 +6,14 @@ import {
   SetStateAction,
   JSX,
   SVGProps,
+  useRef,
   useContext,
 } from "react";
-import { Bell, MessageCircleX, Send } from "lucide-react";
+import { Bell, MessageCircleX, Send, Plus } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import * as marked from "marked";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { ModeToggle } from "@/components/component/theme";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -41,24 +42,26 @@ interface Chat {
   messages: Message[];
 }
 
-export function Chat2(userId: any) {
+export function Chat2(userId: any, userimg: any) {
   const [currentChat, setCurrentChat] = useState<Chat | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [isInputDisabled, setIsInputDisabled] = useState(false);
   const { data, setData } = useContext(MyContext) as MyContextData;
-  console.log(data);
-
+  console.log(userimg)
+  const previousChatId = useRef(data.chatId);
   useEffect(() => {
-
     const fetchLatestChat = async () => {
+      console.log("rednered");
+      console.log(data.chatId);
       try {
-        console.log(`/api/chat/latest?userId=${userId?.userId}&chatId=${data.chatId}`)
         const response = await fetch(
-          `/api/chat/latest?userId=${encodeURIComponent(userId?.userId)}&chatId=${encodeURIComponent(data.chatId)}`
+          `/api/chat/latest?userId=${encodeURIComponent(
+            userId?.userId
+          )}&chatId=${encodeURIComponent(data.chatId)}`
         );
         if (!response.ok) throw new Error("Failed to fetch latest chat");
         const latestChat = await response.json();
-        console.log(latestChat)
+        console.log(latestChat);
         if (latestChat) {
           setCurrentChat(latestChat as Chat);
         }
@@ -69,9 +72,10 @@ export function Chat2(userId: any) {
         });
       }
     };
-
-    fetchLatestChat();
-  }, [data.chatId, userId?.userId]);
+    if (previousChatId.current !== data.chatId) {
+      fetchLatestChat();
+    }
+  }, [data.chatId]);
 
   const handleInputChange = (e: {
     target: { value: SetStateAction<string> };
@@ -167,12 +171,13 @@ export function Chat2(userId: any) {
 
         let fullResponse = "";
         for await (const chunk of stream) {
-          fullResponse += chunk || "";
+          fullResponse = chunk;
+          console.log(chunk);
           setCurrentChat((prevChat) => {
             const updatedMessages = [...prevChat!.messages];
             updatedMessages[updatedMessages.length - 1] = {
               ...updatedMessages[updatedMessages.length - 1],
-              content: fullResponse.trim(),
+              content: chunk,
             };
             return {
               ...prevChat!,
@@ -207,7 +212,6 @@ export function Chat2(userId: any) {
 
   const handleClearChat = () => {
     setCurrentChat(null);
-    
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -252,9 +256,17 @@ export function Chat2(userId: any) {
                 }`}
               >
                 {message.role === "user" ? (
-                  <User className={`primary order-2`} />
+                  <Avatar>
+                    <AvatarImage src={userimg} />
+                    <AvatarFallback>
+                      {" "}
+                      <User className={`primary order-2`} />
+                    </AvatarFallback>
+                  </Avatar>
                 ) : (
-                  <Avatar></Avatar>
+                  <Avatar>
+                    <AvatarFallback>AI</AvatarFallback>
+                  </Avatar>
                 )}
                 <div
                   className={`p-3 rounded-2xl max-w-[70%] overflow-x ${
@@ -289,6 +301,14 @@ export function Chat2(userId: any) {
 
       <footer className="bg-background p-4 shadow-md">
         <div className="container mx-auto flex items-center gap-2">
+          <Button
+            className="rounded-full  text-white"
+            onClick={handleClearChat}
+            variant="outline"
+          >
+            <Plus className="w-5 h-5 text-white" />
+            <span className="sr-only">Clear Chat</span>
+          </Button>
           <Textarea
             placeholder="Type your message..."
             className="flex-1 rounded-2xl p-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary resize-none border-none"
@@ -304,13 +324,6 @@ export function Chat2(userId: any) {
           >
             <Send className="w-5 h-5 text-primary-foreground" />
             <span className="sr-only">Send</span>
-          </Button>
-          <Button
-            className="rounded-full bg-red-500 text-white"
-            onClick={handleClearChat}
-          >
-            <MessageCircleX className="w-5 h-5 text-white" />
-            <span className="sr-only">Clear Chat</span>
           </Button>
         </div>
       </footer>

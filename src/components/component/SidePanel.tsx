@@ -82,16 +82,16 @@ export const AppSidebar = (session: {
           <SidebarMenuSub>
             {session.latestChat?.map((chat: any) => (
               <>
-                <SidebarMenuSubItem key={chat.id}>
+                <SidebarMenuSubItem key={chat.id} className="py-2 cursor-pointer">
                   <SidebarMenuSubButton
                     onClick={() => setData({ ...data, chatId: chat.id })}
                   >
-                    <div className="flex items-center gap-2 py-2">
+                    <div className="flex items-center gap-2">
                       <span>{chat.title}</span>
                     </div>
                   </SidebarMenuSubButton>
                 </SidebarMenuSubItem>
-                <Separator />
+          
               </>
             ))}
           </SidebarMenuSub>

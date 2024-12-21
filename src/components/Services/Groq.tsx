@@ -1,5 +1,19 @@
 import { ChatGroq } from "@langchain/groq";
-
+import { ChatOllama } from "@langchain/ollama";
+import { ChatBedrockConverse } from "@langchain/aws";
+// const llm = new ChatOllama({
+//   model: "llama3",
+//   temperature: 0,
+//   maxRetries: 2,
+//   // other params...
+// });
+// const model = new ChatBedrockConverse({
+//   region: process.env.BEDROCK_AWS_REGION || "us-east-1",
+//   credentials: {
+//     secretAccessKey: process.env.BEDROCK_AWS_SECRET_ACCESS_KEY || "",
+//     accessKeyId: process.env.BEDROCK_AWS_ACCESS_KEY_ID || "",
+//   },
+// });
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import {
@@ -18,7 +32,7 @@ export async function getChatStream(
     model: modelname,
   });
   console.log(messages);
-  var messages_formated = messages.map((message: any) => {
+  let messages_formated = messages.map((message: any) => {
     if (message.sender === "user") {
       return new HumanMessage(message.conent);
     } else {

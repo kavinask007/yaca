@@ -17,7 +17,7 @@ export async function GET(req: Request, res: NextApiResponse) {
     try {
       console.log("dafsfdajlfdkjasldkfj");
       console.log(req);
-      const url = new URL(req.url, `http://${req.headers.host}`);
+      const url = new URL(req.url);
       const userId = url.searchParams.get("userId");
       const chatId = url.searchParams.get("chatId");
 

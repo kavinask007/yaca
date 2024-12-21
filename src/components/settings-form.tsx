@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -13,22 +13,28 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Slider } from "@/components/ui/slider"
-import { Textarea } from "@/components/ui/textarea"
-import { toast } from "@/components/ui/use-toast"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
   llmProvider: z.string(),
   temperature: z.number().min(0).max(1),
   systemMessage: z.string().max(1000),
   apiKey: z.string().min(1),
-})
+});
 
 export function SettingsForm() {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -38,26 +44,26 @@ export function SettingsForm() {
       systemMessage: "",
       apiKey: "",
     },
-  })
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       // Here you would typically send the data to your API
       // For example: await fetch('/api/settings', { method: 'POST', body: JSON.stringify(values) })
-      console.log(values)
+      console.log(values);
       toast({
         title: "Settings updated",
         description: "Your chat settings have been successfully updated.",
-      })
+      });
     } catch (error) {
       toast({
         title: "Error",
         description: "There was a problem updating your settings.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -105,7 +111,8 @@ export function SettingsForm() {
                 />
               </FormControl>
               <FormDescription>
-                Adjust the randomness of the model's output. Lower values make the output more deterministic.
+                Adjust the randomness of the model output. Lower values make
+                the output more deterministic.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -119,13 +126,14 @@ export function SettingsForm() {
               <FormLabel>System Message</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Enter a system message to guide the AI's behavior"
+                  placeholder="Enter a system message to guide the behavior"
                   className="resize-none"
                   {...field}
                 />
               </FormControl>
               <FormDescription>
-                Provide a system message to set the context for the AI's responses.
+                Provide a system message to set the context for the
+                responses.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -138,7 +146,11 @@ export function SettingsForm() {
             <FormItem>
               <FormLabel>API Key</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Enter your API key" {...field} />
+                <Input
+                  type="password"
+                  placeholder="Enter your API key"
+                  {...field}
+                />
               </FormControl>
               <FormDescription>
                 Enter the API key for your chosen LLM provider.
@@ -152,6 +164,5 @@ export function SettingsForm() {
         </Button>
       </form>
     </Form>
-  )
+  );
 }
-

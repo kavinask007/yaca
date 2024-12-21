@@ -5,11 +5,10 @@ export interface MyContextData {
   data: { [key: string]: any };
   setData: (data: { [key: string]: any }) => void;
 }
-
 const MyContext = createContext<MyContextData | null>(null);
 
 const MyContextProvider = ({ children }: { children: React.ReactNode }) => {
-  var storedData: string | null = "{}";
+  let storedData: string | null = "{}";
   if (typeof window !== "undefined") {
     storedData = localStorage.getItem("myContextData");
   }

@@ -16,15 +16,15 @@ export default async function Home() {
   // Fetch last 10 chats and their messages for the current user
   let latestChat = null;
   if (session.user?.id) {
-    console.log("adfsd")
+    console.log("adfsd");
     latestChat = await prisma.chat.findMany({
       where: { userId: session.user?.id as string },
       orderBy: { createdAt: "desc" },
       take: 15,
       skip: 0,
     });
-    console.log(latestChat);
   }
+  console.log(session);
   return (
     <>
       <MyContextProvider>
@@ -34,7 +34,7 @@ export default async function Home() {
             latestChat={latestChat}
           />
           <main className="w-screen h-dvh">
-            <Chat2 userId={session.user?.id} />
+            <Chat2 userId={session.user?.id} userimg={session.user?.image} />
           </main>
         </SidebarProvider>
       </MyContextProvider>
