@@ -9,6 +9,7 @@ import {
   useRef,
   useContext,
 } from "react";
+import { MemoizedMarkdown } from "@/components/component/MemoizedMarkdown";
 import { Bell, MessageCircleX, Send, Plus } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import * as marked from "marked";
@@ -42,21 +43,21 @@ interface Chat {
   messages: Message[];
 }
 
-export function Chat2(userId: any, userimg: any) {
+export function Chat2(session: {
+  user: { image: string | null; name: any; userId: any };
+}) {
   const [currentChat, setCurrentChat] = useState<Chat | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [isInputDisabled, setIsInputDisabled] = useState(false);
   const { data, setData } = useContext(MyContext) as MyContextData;
-  console.log(userimg)
+  console.log(session.user.image);
   const previousChatId = useRef(data.chatId);
   useEffect(() => {
     const fetchLatestChat = async () => {
-      console.log("rednered");
-      console.log(data.chatId);
       try {
         const response = await fetch(
           `/api/chat/latest?userId=${encodeURIComponent(
-            userId?.userId
+            session.user.userId
           )}&chatId=${encodeURIComponent(data.chatId)}`
         );
         if (!response.ok) throw new Error("Failed to fetch latest chat");
@@ -99,7 +100,7 @@ export function Chat2(userId: any, userimg: any) {
             },
             body: JSON.stringify({
               title: inputValue.slice(0, 30) + "...",
-              userId: userId?.userId,
+              userId: session.user.userId,
             }),
           });
 
@@ -246,24 +247,16 @@ export function Chat2(userId: any, userimg: any) {
       </header>
 
       <ScrollArea className="flex-1 overflow-auto p-4">
-        <div className="container mx-auto max-w-2xl space-y-4">
+        <div className="container mx-auto max-w-4xl space-y-4">
           {currentChat &&
             currentChat.messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex items-start gap-4 max-w-300 whitespace-normal break-words ${
-                  message.role === "user" ? "justify-end" : ""
+                className={`flex items-start gap-4 max-w-900  ${
+                  message.role === "user" ? "justify-end" : "justify-start"
                 }`}
               >
-                {message.role === "user" ? (
-                  <Avatar>
-                    <AvatarImage src={userimg} />
-                    <AvatarFallback>
-                      {" "}
-                      <User className={`primary order-2`} />
-                    </AvatarFallback>
-                  </Avatar>
-                ) : (
+                {message.role != "user" && (
                   <Avatar>
                     <AvatarFallback>AI</AvatarFallback>
                   </Avatar>
@@ -276,12 +269,20 @@ export function Chat2(userId: any, userimg: any) {
                   }`}
                 >
                   {isInputDisabled && message.role === "assistant" ? (
-                    <>{message.content}</>
+                    <MemoizedMarkdown
+                    id={message.id}
+                    content={message.content}
+                  />
                   ) : (
-                    <span
-                      dangerouslySetInnerHTML={{
-                        __html: marked.parse(message.content),
-                      }}
+                    // <span
+                    //   // dangerouslySetInnerHTML={{
+                    //   //   __html: marked.parse(message.content),
+                    //   // }}
+
+                    // />
+                    <MemoizedMarkdown
+                      id={message.id}
+                      content={message.content}
                     />
                   )}
                   {isInputDisabled &&
@@ -294,6 +295,15 @@ export function Chat2(userId: any, userimg: any) {
                       </div>
                     )}
                 </div>
+                {message.role === "user" && (
+                  <Avatar>
+                    <AvatarImage src={session.user.image} />
+                    <AvatarFallback>
+                      {" "}
+                      <User className={`primary order-2`} />
+                    </AvatarFallback>
+                  </Avatar>
+                )}
               </div>
             ))}
         </div>

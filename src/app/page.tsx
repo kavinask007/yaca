@@ -34,7 +34,13 @@ export default async function Home() {
             latestChat={latestChat}
           />
           <main className="w-screen h-dvh">
-            <Chat2 userId={session.user?.id} userimg={session.user?.image} />
+            <Chat2
+              user={{
+                image: session.user?.image,
+                name: session.user?.name,
+                userId: session.user?.id,
+              }}
+            />
           </main>
         </SidebarProvider>
       </MyContextProvider>
